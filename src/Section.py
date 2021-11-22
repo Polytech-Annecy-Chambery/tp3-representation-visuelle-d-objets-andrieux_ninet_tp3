@@ -53,11 +53,24 @@ class Section:
     # Defines the vertices and faces 
     def generate(self):
         self.vertices = [ 
-                # Définir ici les sommets
+                [0, 0, 0 ], 
+                [0, 0, self.parameters['height']], 
+                [self.parameters['width'], 0, self.parameters['height']],
+                [self.parameters['width'], 0, 0],      
+                [0, self.parameters['thickness'], 0], 
+                [0, self.parameters['thickness'], self.parameters['height']], 
+                [self.parameters['width'], self.parameters['thickness'], self.parameters['height']],
+                [self.parameters['width'], self.parameters['thickness'], 0]
                 ]
         self.faces = [
-                # définir ici les faces
+                [0, 3, 2, 1],
+                [5, 6, 7, 4],                
+                [1, 0, 4, 5],               
+                [4, 0, 3, 7],
+                [7, 3, 2, 6],
+                [6, 2, 1, 5]
                 ]   
+
 
     # Checks if the opening can be created for the object x
     def canCreateOpening(self, x):
@@ -72,10 +85,35 @@ class Section:
     # Draws the edges
     def drawEdges(self):
         # A compléter en remplaçant pass par votre code
-        pass           
+        gl.glPushMatrix()
+        gl.glTranslatef(self.parameters['position'][0],
+                        self.parameters['position'][1],
+                        self.parameters['position'][2])
+        gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE) 
+        gl.glBegin(gl.GL_QUADS)
+        gl.glColor3fv(self.parameters['color']/2)
+        for face in self.faces:
+            for vertex in face:
+                gl.glVertex3fv(self.vertices[vertex])  
+        gl.glEnd()  
+        gl.glPopMatrix() 
+        print("1")
                     
     # Draws the faces
     def draw(self):
         # A compléter en remplaçant pass par votre code
-        pass
+        self.drawEdges()
+        gl.glPushMatrix()
+        gl.glTranslatef(self.parameters['position'][0],
+                        self.parameters['position'][1],
+                        self.parameters['position'][2])
+        gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_FILL) 
+        gl.glBegin(gl.GL_QUADS)
+        gl.glColor3fv(self.parameters['color'])
+        for face in self.faces:
+            for vertex in face:
+                gl.glVertex3fv(self.vertices[vertex])  
+        gl.glEnd()  
+        gl.glPopMatrix() 
+        print("2")
   
