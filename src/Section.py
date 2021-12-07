@@ -33,7 +33,7 @@ class Section:
         if 'color' not in self.parameters:
             self.parameters['color'] = [0.5, 0.5, 0.5]       
         if 'edges' not in self.parameters:
-            self.parameters['edges'] = False             
+            self.parameters['edges'] = True            
             
         # Objects list
         self.objects = []
@@ -72,41 +72,96 @@ class Section:
                 ]   
 
 
-    # Checks if the opening can be created for the object x
+    # Checks if the opening can be crated for the object x
     def canCreateOpening(self, x):
         # A compléter en remplaçant pass par votre code
-        pass      
+        '''
+        for i in range (0,len(x.vertices)):
+            if x.vertices[i][0] >= self.vertices[0][0] and x.vertices[i][0] <= self.vertices[3][0]:
+                if x.vertices[i][1] >= self.vertices[0][1] and x.vertices[i][1] <= self.vertices[4][1]:
+                    if x.vertices[i][2] >= self.vertices[0][2] and x.vertices[i][2] <= self.vertices[1][2]:
+                        print(i)
+                    else:
+                       return False
+                else:
+                   return False
+            else:
+                return False
+        return True
+    '''
+    
+        pos_s = self.parameters['position']
+        height_s = self.parameters['height']
+        width_s = self.parameters['width']
+        thickness_s = self.parameters['thickness']
         
+        pos_x = x.parameters['position']
+        height_x = x.parameters['height']
+        width_x = x.parameters['width']
+        thickness_x = x.parameters['thickness']
+        
+        cond = pos_x[0] >= pos_s[0] and pos_x[0]<=pos_s[0]+width_s
+        cond = cond and ( pos_x[1]>=pos_s[1] and pos_x[1]<=pos_s[1]+thickness_s)
+        cond = cond and ( pos_x[2]>=pos_s[2] and pos_x[2]<=pos_s[2]+height_s)  
+        cond = cond and ( pos_x[0]+width_x >= pos_s[0] and pos_x[0]+width_x <=pos_s[0]+width_s)
+        cond = cond and ( pos_x[1]+thickness_x >=pos_s[1] and pos_x[1]+thickness_x <=pos_s[1]+thickness_s)  
+        cond = cond and ( pos_x[2]+height_x >=pos_s[2] and pos_x[2]+height_x <=pos_s[2]+height_s)  
+        return cond
+            
     # Creates the new sections for the object x
     def createNewSections(self, x):
         # A compléter en remplaçant pass par votre code
-        pass              
+        if self.canCreateOpening(x) == True:
+            section1 = Section({'position':self.parameters['position'], 
+                     'width':x.parameters['position'][0],
+                     'height':self.parameters['height'],
+                     'thickness': self.parameters['thickness']})
+            
+            section2 = Section({'position':[x.parameters['position'][0],x.parameters['position'][1],x.parameters['position'][2]+x.parameters['height']],
+                     'width':x.parameters['width'],
+                     'height':self.parameters['height']-x.parameters['position'][2]-x.parameters['height'],
+                     'thickness': self.parameters['thickness']})
+            
+            section3 = Section({'position':[x.parameters['position'][0],self.parameters['position'][1],self.parameters['position'][2]],
+                     'width':x.parameters['width'],
+                     'height':x.parameters['position'][2],
+                     'thickness': x.parameters['thickness']})
+            
+            section4 = Section({'position':[x.parameters['position'][0]+x.parameters['width'],x.parameters['position'][1],self.parameters['position'][2]],
+                     'width':self.parameters['width']-x.parameters['position'][0]-x.parameters['width'],
+                     'height':self.parameters['height'],
+                     'thickness': x.parameters['thickness']})
+            
+            return [section1,section2,section3,section4]
         
     # Draws the edges
     def drawEdges(self):
         # A compléter en remplaçant pass par votre code
-        gl.glPushMatrix()
-        gl.glTranslatef(self.parameters['position'][0],
-                        self.parameters['position'][1],
-                        self.parameters['position'][2])
         gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE) 
         gl.glBegin(gl.GL_QUADS)
-        gl.glColor3fv(self.parameters['color']/2)
+        gl.glColor3fv([self.parameters['color'][0]/2, 
+                       self.parameters['color'][1]/2, 
+                       self.parameters['color'][2]/2])
         for face in self.faces:
             for vertex in face:
                 gl.glVertex3fv(self.vertices[vertex])  
         gl.glEnd()  
-        gl.glPopMatrix() 
-        print("1")
+        
                     
     # Draws the faces
     def draw(self):
+        
+        
         # A compléter en remplaçant pass par votre code
-        self.drawEdges()
+        
         gl.glPushMatrix()
         gl.glTranslatef(self.parameters['position'][0],
                         self.parameters['position'][1],
                         self.parameters['position'][2])
+        
+        if self.parameters['edges'] == True:
+            self.drawEdges()
+            
         gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_FILL) 
         gl.glBegin(gl.GL_QUADS)
         gl.glColor3fv(self.parameters['color'])
@@ -115,5 +170,6 @@ class Section:
                 gl.glVertex3fv(self.vertices[vertex])  
         gl.glEnd()  
         gl.glPopMatrix() 
-        print("2")
+        
+        
   
